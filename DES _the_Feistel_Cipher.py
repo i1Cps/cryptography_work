@@ -27,6 +27,7 @@ class DES_Feistel_Block_Cipher():
     def encrypt(self, plainText):
         # Rerepresent plainText as binary number
         plainText = bin(plainText)
+        print('gasdg',plainText)
         
         # Call function to calculate round keys
         try:
@@ -67,15 +68,22 @@ class DES_Feistel_Block_Cipher():
         return array_of_round_keys
 
     def apply_permutation(self, input, permutation_box):
-        input = str(input)
-        print(input[2:], len(input[2:]))
+        input = input[2:]
+        print('input',input)
         # deep copy sort of
         fixed_input = input[:]
         output = np.zeros(64)
         
         for bit in range(len(input[2:])):
+            perm_index = permutation_box[bit]
+            # Get the bit at index 15
+            new_bit = self.get_bit(input,perm_index)
+            
+            print('hh',perm_index)
+            #fixed_input = self.modfidy_bit(input,permutation_box[bit],0)
             #print(fixed_input[int(permutation_box[bit])-1])
-            output[bit] = fixed_input[int(permutation_box[bit])-1]
+            print(bit)
+            #output[bit] = fixed_input[int(permutation_box[bit])-1]
             
             #print('done')
             
@@ -85,6 +93,11 @@ class DES_Feistel_Block_Cipher():
         masked_bit_string = bit_string & ~mask
         modified_bit_string = masked_bit_string | (new_bit << bit_index)
         return modified_bit_string
+    
+    def get_bit(self, bit_string, bit_index):
+        shifted = bit_string << bit_index
+        print(bin(bit_string))
+        print(bin(shifted))
 
 
 # 56 bit
@@ -96,8 +109,8 @@ print(bin(shifted))
 print(bin(final))
 string = '0b100100'
 # 64 bit
-plain_text = int(0b1001010000000001001000000000011010100000001100000000000000110110)
+plain_text = 0b1001010000000001001000000000011010100000001100000000000000110110
 
-encryption = DES_Feistel_Block_Cipher(key)
-print('modi',bin(encryption.modfidy_bit(key,1, 0)))
-encryption.encrypt(plain_text)
+DES = DES_Feistel_Block_Cipher(key)
+print('modi',bin(DES.modfidy_bit(key,1, 0)))
+DES.encrypt(plain_text)
