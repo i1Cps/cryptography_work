@@ -31,7 +31,7 @@ class DES_Feistel_Block_Cipher():
         
         # Call function to calculate round keys
         try:
-            round_keys =self.get_round_keys(key)
+            round_keys = self.get_round_keys(key)
         except ValueError as err:
             print(err) 
         
@@ -63,7 +63,7 @@ class DES_Feistel_Block_Cipher():
             
         print("round keys: ")
         for i in range(16):
-            print(array_of_round_keys[i])
+            print(i,': ',array_of_round_keys[i])
 
         return array_of_round_keys
 
@@ -110,7 +110,7 @@ print(bin(final))
 string = '0b100100'
 # 64 bit
 plain_text = 0b1001010000000001001000000000011010100000001100000000000000110110
-
+print('STARTING __________________________________________')
 DES = DES_Feistel_Block_Cipher(key)
 print('modi',bin(DES.modfidy_bit(key,1, 0)))
 DES.encrypt(plain_text)

@@ -1,4 +1,6 @@
 import numpy as np
+import time
+import sys
 
 class SPN():
     def __init__(self, number_of_rounds=4, debug=False) -> None:
@@ -6,14 +8,14 @@ class SPN():
         self.plain_text = None
         self.cipher_text = None
         self.key = None
-        self.S_Box = None
         self.permutation = None
         self.round_keys = None
         self.debug = debug
-        self.S_Box = {'0':'4', '1':'1', '2':'E', '3':'8',
+        self.s_box = {'0':'4', '1':'1', '2':'E', '3':'8',
                       '4':'D', '5':'6', '6':'2', '7':'B',
                       '8':'F', '9':'C', 'A':'9', 'B':'7',
                       'C':'3', 'D':'A', 'E':'5', 'F':'0'}
+        self.inverse_s_box = None
         
         self.P_box = {1:1, 2:5, 3:9, 4:13, 5:2, 6:6, 7:10, 8:14,
                       9:3, 10:7, 11:11, 12:15, 13:4, 14:8, 15:12, 16:16}
@@ -27,9 +29,7 @@ class SPN():
             msg = 'The key you providied is ' + str(len(str(prime_key))) + ' which is less than 32 bits!'
             raise ValueError(msg)
         if number_of_keys > 13:
-            msg = 'The maximum rounds of encryption is 13, you asked for ' + number_of_keys + ' rounds'
-        # Calculate the minimum key length for given number of rounds
-        
+            msg = 'The maximum number of round keys you can generate is 13, you asked for ' + number_of_keys + ' keys'        
         
         # Initialise Nr empty arrays
         array_of_round_keys = [0 for i in range(number_of_keys)]
@@ -55,7 +55,7 @@ class SPN():
         if(self.debug):
             print("round keys: ")
             for i in range(number_of_keys):
-                print(i,': ',array_of_round_keys[i])
+                print(i+1,': ',array_of_round_keys[i])
 
         return array_of_round_keys
     
@@ -78,7 +78,7 @@ class SPN():
             return input
         
     # Applies substitution box to current input state
-    def apply_S_Box(self,input):
+    def apply_S_Box(self,input, inverse=False):
         input = input[2:] # Remove '0b' tag from beginning of binary string representation
         # Check input is 16 bits long
         if len(input) != 16:
@@ -97,7 +97,10 @@ class SPN():
             decimal_value = int(binary_value,2) # binary -> decimal
             hexadecimal_value = format(decimal_value,'x') # decimal -> hexadecimal
             # Substitute
-            substitution = self.S_Box[hexadecimal_value.upper()]
+            if inverse == True:
+                substitution = self.inverse_s_box[hexadecimal_value.upper()]
+            else:
+                substitution = self.s_box[hexadecimal_value.upper()]
             # Convert hex -> bin
             decimal_value = int(substitution,16) # hexadecimal -> decimal
             binary_value = format(decimal_value,'04b') # decimal -> binary
@@ -125,55 +128,99 @@ class SPN():
     # PlainText 16 bits
     def encrypt(self, plain_text, key):
         
-        self.plain_text = plain_text
-        self.binary_plain_text = self.pad_bits(bin(int(self.plain_text,16)),16)
+        self.plain_text = self.pad_bits(bin(plain_text),16)
         self.key = self.pad_bits(bin(key),32)
         
         self.round_keys = self.get_round_keys(self.key, self.number_of_rounds + 1)
         
-        state =self.binary_plain_text
+        state = self.plain_text
         
         for i in range(self.number_of_rounds-1):
             if self.debug:
-                print('Round number: ', i)
-                print('state: ', state,)
-                print('roundk:', bin(int(self.round_keys[i],2)))
+                print('Round number: ', i+1)
+                print('state:       ', state,)
+                print('roundk:      ', self.pad_bits(bin(int(self.round_keys[i],2)),16))
             # XOR the state with the round key
             xor = self.XOR(state,self.round_keys[i])
-            if self.debug: print('xor: ', xor)
+            if self.debug: print('xor:         ', xor)
             xor_sub = self.apply_S_Box(xor)
-            if self.debug: print('xor_sub: ', xor_sub)
+            if self.debug: print('xor_sub:     ', xor_sub)
             xor_sub_perm = self.apply_P_Box(xor_sub)
-            if self.debug: print('xor_sub_perm: ', xor_sub_perm)
+            if self.debug: print('xor_sub_perm:', xor_sub_perm)
             state = xor_sub_perm
             
-        # XOR state with last round key and apply substitution box
+        # XOR state with the second to last round key and apply substitution box
         xor= self.pad_bits(bin(int(state,2) ^ int(self.round_keys[self.number_of_rounds-1],2)),16)
         xor_sub = self.apply_S_Box(xor)
         state = xor_sub
-        self.binary_cipher_text = self.XOR(state, self.round_keys[self.number_of_rounds])
-        self.cipher_text = format(int(self.binary_cipher_text,2),'x')
+        print('Round number: ', self.number_of_rounds)
+        print('State:       ', state)
+        # XOR with last round key
+        self.cipher_text = self.XOR(state, self.round_keys[self.number_of_rounds])
+        print('Round number: ', self.number_of_rounds+1)
+        print('State:       ', self.cipher_text)
+        print('-----------------------------')
+        print('Plain text in binary:  ', self.plain_text)
+        print('Cipher text in binary: ', self.cipher_text)
         
-        print('Plain text in hexadecimal: ', self.plain_text,)
-        print('Plain text in binary: ', self.binary_plain_text)
-        print('Cipher text in hexadecimal: ', self.cipher_text)
-        print('Cipher text in binary: ', self.binary_cipher_text)
+    def decrypt(self, cipher_text, key):
+        self.cipher_text = self.pad_bits(bin(cipher_text),16)
+        self.key = self.pad_bits(bin(key),32)
+        state = self.cipher_text
+        # Calculate inverse s box
+        self.inverse_s_box = {value:key for key,value in self.s_box.items()}
+        # Calculate the normal round keys
+        self.round_keys = self.get_round_keys(self.key, self.number_of_rounds + 1)
+        # Get round keys for decryption
+        self.inverted_round_keys = self.round_keys[::-1]
+        self.inverted_round_keys.append(self.round_keys[self.number_of_rounds])
+        
+        print('Round number: 1',)
+        print('State:      ', state)
+        xor = self.XOR(state,self.inverted_round_keys[0])
+        print('xor:        ', xor)
+        state = xor
+        
+        print('Round number: 2',)
+        print('State:      ', state)
+        inv_sub = self.apply_S_Box(state,inverse=True)
+        print('inv_sub:    ', inv_sub)
+        inv_sub_xor = self.XOR(inv_sub,self.inverted_round_keys[1])
+        print('xor_inv_sub:',inv_sub_xor)
+        state = inv_sub_xor
+        
+        for i in range(3,self.number_of_rounds +2):
+            print('Round number: ', i)
+            print('State:      ', state)
+            perm = self.apply_P_Box(state)
+            print('perm:       ', perm)
+            perm_inv_s_box = self.apply_S_Box(perm, inverse=True)
+            print('perm_inv:   ', perm_inv_s_box)
+            perm_inv_s_box_xor = self.XOR(perm_inv_s_box,self.inverted_round_keys[i-1])
+            print('perm_sxor:  ', perm_inv_s_box_xor)
+            state = perm_inv_s_box_xor
+            #round2 = self.XOR(self.apply_S_Box(round,inverse=True),self.inverted_round_keys[1])
+            #print('State: ',self.XOR(round2,self.round_keys[self.number_of_rounds]))
+        
+        print('oh no', state)
+        
+
+# ------------------------------------------------------------------------
+
 
 # Create SPN 
-substitution_permutation_network = SPN(debug=False)
-# Enter plain text below
-plain_text='aaaa'  
+substitution_permutation_network = SPN(debug=True)
 # Change key below 
 key = 0b11100111011001111001000000111101
-
-# If you have a binary plain text instead enter below
-binary_plain_text = None 
-if binary_plain_text:
-    plain_text = format(int(binary_plain_text,2),'x')
+# Change plain text below
+plain_text = 0b0100111010100001
+# Change the cipher text below
+cipher_text = 0b0111000011010100
 
 # Encrypt
 try:
-    substitution_permutation_network.encrypt(plain_text, key)
+    #substitution_permutation_network.encrypt(plain_text, key)
+    substitution_permutation_network.encrypt(cipher_text, key)
 except ValueError as err:
     print(err) 
     
