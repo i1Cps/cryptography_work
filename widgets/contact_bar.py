@@ -4,7 +4,7 @@ from PIL import Image
 # Contact bar for contact information
 class ContactBar(ctk.CTkFrame):
     def __init__(self, parent, controller):
-        super().__init__(master=parent, fg_color='red')
+        super().__init__(master=parent, fg_color='transparent')
         # Import icons
         self.open_menu_img = ctk.CTkImage(
             light_image= Image.open('assets/menu.png'),

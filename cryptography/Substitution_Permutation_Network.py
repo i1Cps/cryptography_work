@@ -207,7 +207,9 @@ class SPN():
 
 # ------------------------------------------------------------------------
 
+# Uncomment to run and use SPN file on its own
 
+""" 
 # Create SPN 
 substitution_permutation_network = SPN(debug=True)
 # Change key below 
@@ -223,4 +225,4 @@ try:
     substitution_permutation_network.encrypt(cipher_text, key)
 except ValueError as err:
     print(err) 
-    
+     """

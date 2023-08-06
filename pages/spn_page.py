@@ -15,7 +15,7 @@ class SPNPage(ctk.CTkFrame):
         self.dark_mode_button = DarkModeButton(self, controller=parent)
         
         # Create a frame to house the all the native SPN page widgets widgets
-        self.main_frame = ctk.CTkFrame(self, fg_color='blue',width=630)
+        self.main_frame = ctk.CTkFrame(self, fg_color='transparent',width=630)
         self.main_frame.place(relx = 0.2, rely = 0, relheight = 1, relwidth = 0.65)
         
         # Add welcome message
@@ -39,30 +39,61 @@ class SPNPage(ctk.CTkFrame):
         self.key = 0b11100111011001111001000000111101
         
         self.plain_text = 0b0100111010100001
-        self.cipher_text = cipher_text = 0b0111000011010100
+        self.cipher_text = 0b0111000011010100
         
         self.create_widgets()
         self.create_layout()
     
     def create_widgets(self):
         # Key
-        key_display_value = 'Key: ' + self.spn.pad_bits(bin(self.key),32)
         self.key_entry_button = ctk.CTkButton(self.spn_frame,
-                                              fg_color=('#cccccc', '#5c2958'),
+                                              fg_color=('#cccccc', '#4a2146'),
                                               text='Change key value',
-                                              border_color=('#5c2958','#cccccc'),
-                                              command=lambda: self.open_input_dialog_event())
+                                              border_color=('#4a2146','#cccccc'),
+                                              command=lambda: self.input_custom_key())
+        key_display_value = 'Key: ' + self.spn.pad_bits(bin(self.key),32)
         self.key_label = TextBox(self.spn_frame,key_display_value, 15)
         
-        # Encryption and Decryption
-        # create tabview
-        self.encryptdecrypt = customtkinter.CTkTabview(self, width=250)
-        self.tabview.grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.tabview.add("CTkTabview")
-        self.tabview.add("Tab 2")
-        self.tabview.add("Tab 3")
-        self.tabview.tab("CTkTabview").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
-        self.tabview.tab("Tab 2").grid_columnconfigure(0, weight=1)
+        
+        # Encryption and Decryption tabs
+        self.encryptdecrypt = ctk.CTkTabview(self.spn_frame, width=250, fg_color=('#b9bfc1','#4a2146'))
+        self.encryptdecrypt.add("Encrypt")
+        self.encryptdecrypt.add("Decrypt")
+        self.encryptdecrypt.tab("Encrypt").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
+        self.encryptdecrypt.tab("Decrypt").grid_columnconfigure(0, weight=1)
+        
+        # Plain Text and cipher text
+        self.plain_text_entry_button = ctk.CTkButton(self.encryptdecrypt.tab('Encrypt'),
+                                              fg_color=('#cccccc', '#4a2146'),
+                                              text='Change the plain text value',
+                                              border_color=('#5c2958','#cccccc'),
+                                              command=lambda: self.input_custom_key())
+        self.cipher_text_entry_button = ctk.CTkButton(self.encryptdecrypt.tab('Decrypt'),
+                                              fg_color=('#cccccc', '#4a2146'),
+                                              text='Change the cipher text value',
+                                              border_color=('#5c2958','#cccccc'),
+                                              command=lambda: self.input_custom_key())
+        plain_text_display_value = 'Plain Text: ' + self.spn.pad_bits(bin(self.plain_text),16)
+        cipher_text_dispaly_value = 'Cipher Text: ' + self.spn.pad_bits(bin(self.cipher_text),16)
+        self.plain_text_label = TextBox(self.encryptdecrypt.tab('Encrypt'), plain_text_display_value, 15, side='top')
+        self.cipher_text_label = TextBox(self.encryptdecrypt.tab('Decrypt'), cipher_text_dispaly_value, 15)
+        
+        
+        # Encypt and decrypt buttons
+        self.encrypt_button = ctk.CTkButton(self.encryptdecrypt.tab('Encrypt'),
+                                            fg_color=('#cccccc', '#4a2146'),
+                                              text='Encrypt',
+                                              border_color=('#5c2958','#cccccc'),
+                                              command=lambda: self.run_encryption())
+        # Encypt and decrypt buttons
+        self.decrypt_button = ctk.CTkButton(self.encryptdecrypt.tab('Decrypt'),
+                                            fg_color=('#cccccc', '#4a2146'),
+                                              text='Decrypt',
+                                              border_color=('#5c2958','#cccccc'),
+                                              command=lambda: self.run_decryption())
+        
+        self.encrypted_plain_text = TextBox(self.encryptdecrypt.tab('Encrypt'), '', 15, side='bottom')
+        self.decrypted_cipher_text = TextBox(self.encryptdecrypt.tab('Decrypt'), '', 15, side = 'bottom')
         
         #self.spn.pad_bits(bin(self.key)
         
@@ -70,30 +101,52 @@ class SPNPage(ctk.CTkFrame):
     def create_layout(self):
         #self.key_entry.pack(side='top')
         self.key_label.pack(side='top',fill='y')
-        self.key_entry_button.pack(side='top')
         
-    def open_input_dialog_event(self):
-        dialog = ctk.CTkInputDialog(text="Enter your key:", title="Chane the key")
+        self.key_entry_button.pack(side='top')
+        self.plain_text_entry_button.pack()
+        self.cipher_text_entry_button.pack()
+        self.encryptdecrypt.pack(expand=True,side = 'top', fill='both', padx = 10, pady = 15)
+        self.encrypt_button.pack(side='top', expand=True, fill='both')
+        self.decrypt_button.pack()
+        
+        
+        
+    def input_custom_key(self):
+        dialog = ctk.CTkInputDialog(text="Enter your key:", title="Change the key")
         self.key = bin(int(dialog.get_input(),2))
         key_display_value = 'Key: ' + self.key[2:]
         self.key_label.update_text(key_display_value)
         
-        print("CTkInputDialog:", self.key)
+    def input_custom_plain_text(self):
+        dialog = ctk.CTkInputDialog(text="Enter your key:", title="Change the key")
+        self.key = bin(int(dialog.get_input(),2))
+        key_display_value = 'Key: ' + self.key[2:]
+        self.key_label.update_text(key_display_value)
         
-    def run(self):
-        # Create SPN 
-        substitution_permutation_network = SPN(debug=True)
-        # Change key below 
-        key = 0b11100111011001111001000000111101
-        # Change plain text below
-        plain_text = 0b0100111010100001
-        # Change the cipher text below
-        cipher_text = 0b0111000011010100
-
+    def input_custom_cipher_text(self):
+        dialog = ctk.CTkInputDialog(text="Enter your key:", title="Change the key")
+        self.key = bin(int(dialog.get_input(),2))
+        key_display_value = 'Key: ' + self.key[2:]
+        self.key_label.update_text(key_display_value)
+        
+        
+    def run_encryption(self):
         # Encrypt
         try:
-            #substitution_permutation_network.encrypt(plain_text, key)
-            substitution_permutation_network.encrypt(cipher_text, key)
+            self.spn.encrypt(self.plain_text, self.key)
+            self.encrypted_plain_text.update_text(self.spn.cipher_text)
+            self.encrypted_plain_text.pack(side='bottom')
         except ValueError as err:
             print(err) 
+    
+    def run_decryption(self):
+        # Decrypt
+        try:
+            self.spn.decrypt(self.cipher_text, self.key)
+            self.decrypted_cipher_text.update_text(self.spn.plain_text)
+            self.decrypted_cipher_text.pack(side='bottom')
+        except ValueError as err:
+            print(err) 
+        
+        
                 
