@@ -81,13 +81,13 @@ class SPNPage(ctk.CTkFrame):
         
         # Encypt and decrypt buttons
         self.encrypt_button = ctk.CTkButton(self.encryptdecrypt.tab('Encrypt'),
-                                            fg_color=('#cccccc', '#4a2146'),
+                                            fg_color=('#b9bfc1', '#4a2146'),
                                               text='Encrypt',
                                               border_color=('#5c2958','#cccccc'),
                                               command=lambda: self.run_encryption())
         # Encypt and decrypt buttons
         self.decrypt_button = ctk.CTkButton(self.encryptdecrypt.tab('Decrypt'),
-                                            fg_color=('#cccccc', '#4a2146'),
+                                            fg_color=('#b9bfc1', '#4a2146'),
                                               text='Decrypt',
                                               border_color=('#5c2958','#cccccc'),
                                               command=lambda: self.run_decryption())
@@ -128,7 +128,6 @@ class SPNPage(ctk.CTkFrame):
         self.key = bin(int(dialog.get_input(),2))
         key_display_value = 'Key: ' + self.key[2:]
         self.key_label.update_text(key_display_value)
-        
         
     def run_encryption(self):
         # Encrypt

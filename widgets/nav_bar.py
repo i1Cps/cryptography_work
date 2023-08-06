@@ -40,7 +40,7 @@ class NavBar(ctk.CTkFrame):
                                                    compound='left',
                                                    height=50,
                                                    width=50,
-                                                   corner_radius=0,
+                                                   corner_radius=10,
                                                    fg_color='transparent',
                                                    hover_color=('#b9bfc1','#4a2146'),
                                                    command=lambda: self.animate())
