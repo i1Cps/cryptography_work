@@ -6,6 +6,7 @@ from PIL import Image
 class NavBar(ctk.CTkFrame):
     def __init__(self, parent, controller, hidden):
         super().__init__(master=parent, fg_color='transparent', width = 150)
+        self.controller = controller
         # Import icons
         self.open_menu_img = ctk.CTkImage(
             light_image= Image.open('assets/menu.png'),
@@ -25,7 +26,7 @@ class NavBar(ctk.CTkFrame):
         self.current_position = self.start_position if self.hidden else self.end_position
         
         # Create widgets
-        self.create_navigation_option_widgets(controller)
+        self.create_navigation_option_widgets()
         self.create_toggle_widget()
         self.create_layout()
         
@@ -49,6 +50,7 @@ class NavBar(ctk.CTkFrame):
     def create_navigation_option_widgets(self, controller):
         # Create Frame to hold menu options
         self.options_frame    = ctk.CTkFrame(self, fg_color='transparent',width = 15, height = 40)
+        self.page_buttons = []
         self.main_page_button = ctk.CTkButton(self.options_frame, 
                                               fg_color='transparent', 
                                               height=80, text= 'Main', 
@@ -57,6 +59,7 @@ class NavBar(ctk.CTkFrame):
                                               hover_color=('#3693ec','#2667a5'),
                                               corner_radius=5, 
                                               command = lambda : controller.show_page('MainPage'))
+        self.page_buttons.append(self.main_page_button)
         self.spn_page_button  = ctk.CTkButton(self.options_frame,
                                               fg_color='transparent',
                                               height=80,
@@ -66,7 +69,8 @@ class NavBar(ctk.CTkFrame):
                                               hover_color=('#3693ec','#2667a5'),
                                               corner_radius=5,
                                               command = lambda : controller.show_page('SPNPage'))
-        self.cryptoanalysis_page = ctk.CTkButton(self.options_frame,
+        self.page_buttons.append(self.spn_page_button)
+        self.cryptoanalysis_page_button = ctk.CTkButton(self.options_frame,
                                               fg_color='transparent',
                                               state= 'disabled',
                                               height=80,
@@ -75,7 +79,8 @@ class NavBar(ctk.CTkFrame):
                                               text_color_disabled=('#6d5b6b','#b9bfc1'),
                                               hover_color=('#3693ec','#2667a5'),
                                               corner_radius=5)
-        self.data_encryption_standard_page = ctk.CTkButton(self.options_frame,
+        self.page_buttons.append(self.cryptoanalysis_page_button)
+        self.data_encryption_standard_page_button = ctk.CTkButton(self.options_frame,
                                               fg_color='transparent',
                                               state= 'disabled',
                                               height=80,
@@ -84,7 +89,8 @@ class NavBar(ctk.CTkFrame):
                                               text_color_disabled=('#6d5b6b','#b9bfc1'),
                                               hover_color=('#3693ec','#2667a5'),
                                               corner_radius=5)
-        self.advanced_encryption_algorithm_page = ctk.CTkButton(self.options_frame,
+        self.page_buttons.append(self.data_encryption_standard_page_button)
+        self.advanced_encryption_algorithm_page_button = ctk.CTkButton(self.options_frame,
                                               fg_color='transparent',
                                               state='disabled',
                                               height=80,
@@ -93,7 +99,8 @@ class NavBar(ctk.CTkFrame):
                                               text_color_disabled=('#6d5b6b','#b9bfc1'),
                                               hover_color=('#3693ec','#2667a5'),
                                               corner_radius=5)
-        self.hash_functions_page = ctk.CTkButton(self.options_frame,
+        self.page_buttons.append(self.advanced_encryption_algorithm_page_button)
+        self.hash_functions_page_button = ctk.CTkButton(self.options_frame,
                                               fg_color='transparent',
                                               state='disabled',
                                               height=80,
@@ -102,6 +109,8 @@ class NavBar(ctk.CTkFrame):
                                               text_color_disabled=('#6d5b6b','#b9bfc1'),
                                               hover_color=('#3693ec','#2667a5'),
                                               corner_radius=5)
+        self.page_buttons.append(self.hash_functions_page_button)
+        self.page_buttons
     
     # Function places all widgets in the navigation bar
     def create_layout(self):
@@ -117,6 +126,14 @@ class NavBar(ctk.CTkFrame):
         self.advanced_encryption_algorithm_page.pack(ipadx = 5, padx = 5 )
         self.hash_functions_page.pack(ipadx = 5, padx = 5 )
     
+    def change_page(self,selected_page, selected_page_button):
+        # Switch to selected page
+        self.controller.show_page(selected_page)
+        # Set all other navigation bar buttons to 'non selected colour'
+        for page_button in page_buttons:
+            page_button.configure(fg_color='transparent')
+        # set given navigation bar button to 'selected colour'
+        selected_page_button.configure(fg_colour=('#cccccc', '#5c2958'))
     # Animation for navigation bar
     def animate(self):
         # stops function call if its currently animating

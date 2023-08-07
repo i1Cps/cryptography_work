@@ -10,9 +10,9 @@ class MainPage(ctk.CTkFrame):
         super().__init__(master=parent, fg_color=('#b9bfc1','#4a2146'))
         # Navigation bar has a relative width of 0.2
         self.nav_bar = NavBar(self, controller = parent, hidden= True)
-        self.dark_mode_button = DarkModeButton(self, controller=parent)
         # Contact bar has relative width of 0.15
         self.contact_bar = ContactBar(self,controller=parent)
+        self.dark_mode_button = DarkModeButton(self, controller=parent)
         # Main frame has relative width 0.65
         # Create a frame to house the all the native SPN page widgets widgets
         self.main_frame = ctk.CTkFrame(self, fg_color='transparent')
@@ -20,5 +20,5 @@ class MainPage(ctk.CTkFrame):
         
         welcome_message = 'Hello, Welcome to my Cryptography Portfolio. \nMy name is Theo Moore-Calters and I\'m a final ' \
             'year\n Computer Science student at the University of Bath'
-        self.welcome_message = TextBox(self.main_frame, welcome_message, 20, height = 100)
+        self.welcome_message = TextBox(self.main_frame, welcome_message, 20, height = 100, colour=('#cccccc', '#5c2958'))
         

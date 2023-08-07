@@ -1,8 +1,7 @@
 # Modules
 import tkinter as tk
 import customtkinter as ctk
-# Navigation bar
-from widgets.nav_bar import NavBar
+
 # Pages in the app (frames)
 from pages.main_page import *
 from pages.spn_page import  *
@@ -21,11 +20,14 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
         
+        #TODO: Add dark mode button to main.py and control it globally
+        # Attach every page to a global frame and attach the dark mode button to the window itself
+        
         # Pages logic
         self.all_pages = {}
         
-        # iterating through a tuple consisting
-        # of the different page layouts
+        # Iterating through a tuple consisting
+        # of the different pages
         
         for P in (MainPage,SPNPage):
             page = P(self)
@@ -34,15 +36,18 @@ class App(ctk.CTk):
             # MainPage, SecondPage respectively with
             page.grid(row=0, column=0, sticky='nwse')
         
+        # Initialises app with main page
         self.show_page('MainPage')
         
         # Run
         self.mainloop()
         
+    # Function that changes app to specified page
     def show_page(self,page_name):
         page = self.all_pages[page_name]
         page.tkraise()
-        
+    
+    # Function that toggles dark mode on or off 
     def toggle_dark_mode(self):
         if self.dark_mode:
             # Switch to light mode

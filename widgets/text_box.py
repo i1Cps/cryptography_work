@@ -4,7 +4,7 @@ from PIL import Image
 # Navigation bar for navigating the app
 class TextBox(ctk.CTkFrame):
     def __init__(self, parent, message, text_size, width=50, height=350,
-                 corner_radius=10, side = 'top', colour = ('#cccccc', '#5c2958')):
+                 corner_radius=10, side = 'top', colour = ('transparent', 'transparent')):
         super().__init__(master=parent, fg_color=colour, width=width, height=height, corner_radius=corner_radius)
         
         font = ctk.CTkFont(family='Luckiest Guy', size=text_size)
