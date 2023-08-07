@@ -1,6 +1,4 @@
 import numpy as np
-import time
-import sys
 
 class SPN():
     def __init__(self, number_of_rounds=4, debug=False) -> None:
@@ -68,7 +66,7 @@ class SPN():
         xor = self.pad_bits(bin(int(state,2) ^ int(round_key,2)),16)
         return xor
         
-    # Function to a=pad a bit_string to specified length
+    # Function to pad a bit_string to specified length
     def pad_bits(self, input, padded_length):
         # Takes binary string representation as input
         if len(input)-2 < padded_length:
@@ -127,7 +125,7 @@ class SPN():
         
     # PlainText 16 bits
     def encrypt(self, plain_text, key):
-        
+        print(key)
         self.plain_text = self.pad_bits(bin(plain_text),16)
         self.key = self.pad_bits(bin(key),32)
         
@@ -174,30 +172,31 @@ class SPN():
         # Get round keys for decryption
         self.inverted_round_keys = self.round_keys[::-1]
         self.inverted_round_keys.append(self.round_keys[self.number_of_rounds])
-        
-        print('Round number: 1',)
-        print('State:      ', state)
+        if self.debug:
+            print('Round number: 1',)
+            print('State:      ', state)
         xor = self.XOR(state,self.inverted_round_keys[0])
-        print('xor:        ', xor)
+        if self.debug: print('xor:        ', xor)
         state = xor
-        
-        print('Round number: 2',)
-        print('State:      ', state)
+        if self.debug:
+            print('Round number: 2',)
+            print('State:      ', state)
         inv_sub = self.apply_S_Box(state,inverse=True)
-        print('inv_sub:    ', inv_sub)
+        if self.debug: print('inv_sub:    ', inv_sub)
         inv_sub_xor = self.XOR(inv_sub,self.inverted_round_keys[1])
-        print('xor_inv_sub:',inv_sub_xor)
+        if self.debug: print('xor_inv_sub:',inv_sub_xor)
         state = inv_sub_xor
         
         for i in range(3,self.number_of_rounds +2):
-            print('Round number: ', i)
-            print('State:      ', state)
+            if self.debug:
+                print('Round number: ', i)
+                print('State:      ', state)
             perm = self.apply_P_Box(state)
-            print('perm:       ', perm)
+            if self.debug: print('perm:       ', perm)
             perm_inv_s_box = self.apply_S_Box(perm, inverse=True)
-            print('perm_inv:   ', perm_inv_s_box)
+            if self.debug: print('perm_inv:   ', perm_inv_s_box)
             perm_inv_s_box_xor = self.XOR(perm_inv_s_box,self.inverted_round_keys[i-1])
-            print('perm_sxor:  ', perm_inv_s_box_xor)
+            if self.debug: print('perm_sxor:  ', perm_inv_s_box_xor)
             state = perm_inv_s_box_xor
             #round2 = self.XOR(self.apply_S_Box(round,inverse=True),self.inverted_round_keys[1])
             #print('State: ',self.XOR(round2,self.round_keys[self.number_of_rounds]))
