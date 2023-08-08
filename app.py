@@ -20,9 +20,6 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
         
-        #TODO: Add dark mode button to main.py and control it globally
-        # Attach every page to a global frame and attach the dark mode button to the window itself
-        
         # Pages logic
         self.all_pages = {}
         
