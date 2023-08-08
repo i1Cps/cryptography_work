@@ -29,11 +29,10 @@ class App(ctk.CTk):
         for P in (MainPage,SPNPage):
             page = P(self)
             self.all_pages[P.__name__] = page
-            # initializing frame of that object from
-            # MainPage, SecondPage respectively with
+            # initializing each page in app
             page.grid(row=0, column=0, sticky='nwse')
         
-        # Initialises app with main page
+        # Starts app with main page
         self.show_page('MainPage')
         
         # Run
@@ -56,7 +55,6 @@ class App(ctk.CTk):
             # Switch to dark mode
             ctk.set_appearance_mode('dark')
             self.dark_mode = True
-            
-        
+              
 App('Cryptography Work', (1000,600))
 
