@@ -151,15 +151,17 @@ class SPN():
         xor= self.pad_bits(bin(int(state,2) ^ int(self.round_keys[self.number_of_rounds-1],2)),16)
         xor_sub = self.apply_S_Box(xor)
         state = xor_sub
-        print('Round number: ', self.number_of_rounds)
-        print('State:       ', state)
+        if self.debug:
+            print('Round number: ', self.number_of_rounds)
+            print('State:       ', state)
         # XOR with last round key
         self.cipher_text = self.XOR(state, self.round_keys[self.number_of_rounds])
-        print('Round number: ', self.number_of_rounds+1)
-        print('State:       ', self.cipher_text)
-        print('-----------------------------')
-        print('Plain text in binary:  ', self.plain_text)
-        print('Cipher text in binary: ', self.cipher_text)
+        if self.debug:
+            print('Round number: ', self.number_of_rounds+1)
+            print('State:       ', self.cipher_text)
+            print('-----------------------------')
+            print('Plain text in binary:  ', self.plain_text)
+            print('Cipher text in binary: ', self.cipher_text)
         
     def decrypt(self, cipher_text, key):
         self.cipher_text = self.pad_bits(bin(cipher_text),16)
@@ -201,6 +203,7 @@ class SPN():
             #round2 = self.XOR(self.apply_S_Box(round,inverse=True),self.inverted_round_keys[1])
             #print('State: ',self.XOR(round2,self.round_keys[self.number_of_rounds]))
         
+        self.plain_text = state
         print('oh no', state)
         
 

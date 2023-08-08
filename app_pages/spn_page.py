@@ -1,20 +1,22 @@
 import customtkinter as ctk
 # Widgets
-from widgets.nav_bar import NavBar
-from widgets.dark_mode_button import DarkModeButton
-from widgets.text_box import TextBox
-from widgets.contact_bar import ContactBar
+from app_widgets.nav_bar import NavBar
+from app_widgets.dark_mode_button import DarkModeButton
+from app_widgets.text_box import TextBox
+from app_widgets.contact_bar import ContactBar
 # Cryptography
 from cryptography.Substitution_Permutation_Network import SPN
 # Binary helper function
-from helpers.binary_helper import BinaryHelper
+from cryptography.helpers.binary_helper import BinaryHelper
 
 class SPNPage(ctk.CTkFrame):
     def __init__(self,parent):
         super().__init__(master=parent, fg_color=('#b9bfc1','#4a2146'))
+        self.parent = parent
         self.nav_bar = NavBar(self, controller = parent, hidden=False)
         self.contact_bar = ContactBar(self, controller=parent)
         self.dark_mode_button = DarkModeButton(self, controller=parent)
+        self.dark_mode = True
         
         # Create a frame to house the all the native SPN page widgets widgets
         self.main_frame = ctk.CTkFrame(self, fg_color='transparent',width=630)
@@ -198,10 +200,22 @@ class SPNPage(ctk.CTkFrame):
         # Decrypt
         try:
             self.spn.decrypt(self.cipher_text, self.key)
-            self.decrypted_cipher_text.update_text('Dectrypted Text: ' + self.spn.plain_text[2:])
+            self.decrypted_cipher_text.update_text('Decrypted Text: ' + self.spn.plain_text[2:])
             self.decrypted_cipher_text.pack(side='bottom', pady=5)
         except ValueError as err:
-            print(err) 
+            print(err)
+            
+    # Updates the toggle bar status from different pages
+    def update_dark_mode(self,dark_mode):
+        if dark_mode == self.dark_mode:
+            return
+        # Update property and switch position 
+        self.dark_mode = dark_mode
+        # Command wont be triggered
+        if dark_mode == True:
+            self.dark_mode_button.switch.select()
+        else:
+            self.dark_mode_button.switch.deselect()
         
         
                 

@@ -3,8 +3,8 @@ import tkinter as tk
 import customtkinter as ctk
 
 # Pages in the app (frames)
-from pages.main_page import *
-from pages.spn_page import  *
+from app_pages.main_page import *
+from app_pages.spn_page import  *
 
 class App(ctk.CTk):
     def __init__(self, title, size):
@@ -43,8 +43,10 @@ class App(ctk.CTk):
         self.mainloop()
         
     # Function that changes app to specified page
-    def show_page(self,page_name):
+    def show_page(self,page_name, dark_mode = True):
         page = self.all_pages[page_name]
+        # Updates the dark mode switch status for new opened pages
+        page.update_dark_mode(dark_mode)
         page.tkraise()
     
     # Function that toggles dark mode on or off 
