@@ -204,7 +204,6 @@ class SPN():
             #print('State: ',self.XOR(round2,self.round_keys[self.number_of_rounds]))
         
         self.plain_text = state
-        print('oh no', state)
         
 
 # ------------------------------------------------------------------------
