@@ -189,7 +189,6 @@ class SPNPage(ctk.CTkFrame):
     def run_encryption(self):
         # Encrypt
         try:
-            print(self.key)
             self.spn.encrypt(self.plain_text, self.key)
             self.encrypted_plain_text.update_text('Encrypted Text: ' + self.spn.cipher_text[2:])
             self.encrypted_plain_text.pack(side='bottom',pady = 5)
